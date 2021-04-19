@@ -1,0 +1,5 @@
+db:
+  name: dbname
+  table: dbtable
+  user: dbuser
+  pass: dbpass

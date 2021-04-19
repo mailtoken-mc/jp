@@ -1,0 +1,4 @@
+name: jp
+version: 1.0
+api-version: 1.16
+main: io.github.qgerman2.jp.Main
