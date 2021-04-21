@@ -1,5 +1,6 @@
 db:
   name: dbname
-  table: dbtable
+  playertable: dbtable
+  historytable: dbhistorytable
   user: dbuser
   pass: dbpass

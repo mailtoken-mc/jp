@@ -22,7 +22,7 @@
                 <version>3.2.0</version>
                 <configuration>
                     <forceCreation>true</forceCreation>
-                    <outputDirectory>../server/main/plugins</outputDirectory>
+                    <outputDirectory>../../server/main/plugins</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
