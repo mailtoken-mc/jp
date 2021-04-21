@@ -189,9 +189,11 @@ public class Database {
                 try {
                     String query = "UPDATE " +
                             "`" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
-                            "SET `advancements` = INSERT(`advancements`, ?, 1, '1')";
+                            "SET `advancements` = INSERT(`advancements`, ?, 1, '1') " +
+                            "WHERE `name` = ?";
                     PreparedStatement stmnt = conn.prepareStatement(query);
                     stmnt.setInt(1, advancement);
+                    stmnt.setString(2, player);
                     stmnt.executeQuery();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
