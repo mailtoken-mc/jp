@@ -1,7 +1,6 @@
 package io.github.qgerman2.jp;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.advancement.Advancement;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {

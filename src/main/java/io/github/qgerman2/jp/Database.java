@@ -1,18 +1,13 @@
 package io.github.qgerman2.jp;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import org.bukkit.scheduler.BukkitRunnable;
 import org.mariadb.jdbc.Driver;
-
-import javax.xml.transform.Result;
 import java.sql.*;
 
 public class Database {
     private static JavaPlugin Plugin;
     private static Connection conn;
-    private static final String table = "jugador";
     public static void initialize(JavaPlugin Plugin) {
         Database.Plugin = Plugin;
         try {
@@ -47,7 +42,7 @@ public class Database {
                         "`kills` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
                         "`experience` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
                         "`time` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
-                        "`advancements` BINARY(8) NOT NULL DEFAULT repeat('0', 8)," +
+                        "`advancements` BINARY(80) NOT NULL DEFAULT repeat('0', 80)," +
                         "CONSTRAINT UNIQUE (name))";
                 stmnt = conn.prepareStatement(query);
                 stmnt.executeQuery();
@@ -162,6 +157,41 @@ public class Database {
                     stmnt.setString(2, player2);
                     stmnt.setString(3, type);
                     stmnt.setString(4, json);
+                    stmnt.executeQuery();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        }.runTaskAsynchronously(Plugin);
+    }
+    public static void updatePlayerKills(String player) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                try {
+                    String query = "UPDATE " +
+                            "`" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
+                            "SET `kills` = `kills` + 1 " +
+                            "WHERE `name` = ?";
+                    PreparedStatement stmnt = conn.prepareStatement(query);
+                    stmnt.setString(1, player);
+                    stmnt.executeQuery();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        }.runTaskAsynchronously(Plugin);
+    }
+    public static void updatePlayerAdvancement(String player, Integer advancement) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                try {
+                    String query = "UPDATE " +
+                            "`" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
+                            "SET `advancements` = INSERT(`advancements`, ?, 1, '1')";
+                    PreparedStatement stmnt = conn.prepareStatement(query);
+                    stmnt.setInt(1, advancement);
                     stmnt.executeQuery();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
