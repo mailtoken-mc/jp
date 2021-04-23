@@ -43,45 +43,45 @@ public class Database {
             stmnt.setString(2, Config.getDB("playertable"));
             result = stmnt.executeQuery();
             if (result.next()) {
-                Plugin.getLogger().info("Found player database '" + Config.getDB("playertable") + "'");
+                Plugin.getLogger().info("Found player table '" + Config.getDB("playertable") + "'");
             } else {
-                Plugin.getLogger().info("Couldn't find player database '" + Config.getDB("playertable") + "', creating it...");
+                Plugin.getLogger().info("Couldn't find player table '" + Config.getDB("playertable") + "', creating it...");
                 query = "CREATE TABLE `" + Config.getDB("playertable") + "` (" +
-                        "`name` TINYTEXT NOT NULL DEFAULT ''," +
-                        "`alive` INT(1) UNSIGNED NULL DEFAULT '1'," +
-                        "`born` TIMESTAMP NOT NULL DEFAULT current_timestamp()," +
-                        "`died` TIMESTAMP NULL DEFAULT NULL," +
-                        "`death_reason` TINYTEXT NULL DEFAULT NULL," +
-                        "`death_by` TINYTEXT DEFAULT NULL, " +
-                        "`kills` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
-                        "`experience` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
-                        "`time` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
-                        "`advancements` BINARY(80) NOT NULL DEFAULT repeat('0', 80)," +
-                        "`advancement_count` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
-                        "CONSTRAINT UNIQUE (name))";
+                        " `name` TINYTEXT NOT NULL DEFAULT ''," +
+                        " `alive` INT(1) UNSIGNED NULL DEFAULT '1'," +
+                        " `born` TIMESTAMP NOT NULL DEFAULT current_timestamp()," +
+                        " `died` TIMESTAMP NULL DEFAULT NULL," +
+                        " `death_reason` TINYTEXT NULL DEFAULT NULL," +
+                        " `death_by` TINYTEXT DEFAULT NULL, " +
+                        " `kills` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
+                        " `experience` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
+                        " `time` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
+                        " `advancements` BINARY(80) NOT NULL DEFAULT repeat('0', 80)," +
+                        " `advancement_count` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
+                        " CONSTRAINT UNIQUE (name))";
                 stmnt = conn.prepareStatement(query);
                 stmnt.executeQuery();
             }
             //Check for history table
             query = "SELECT `TABLE_NAME` " +
-                    "FROM `information_schema`.`TABLES` " +
-                    "WHERE `TABLE_SCHEMA` = ? " +
-                    "AND `TABLE_NAME` = ? ";
+                    " FROM `information_schema`.`TABLES` " +
+                    " WHERE `TABLE_SCHEMA` = ? " +
+                    " AND `TABLE_NAME` = ? ";
             stmnt = conn.prepareStatement(query);
             stmnt.setString(1, Config.getDB("name"));
             stmnt.setString(2, Config.getDB("historytable"));
             result = stmnt.executeQuery();
             if (result.next()) {
-                Plugin.getLogger().info("Found history database '" + Config.getDB("historytable") + "'");
+                Plugin.getLogger().info("Found history table '" + Config.getDB("historytable") + "'");
             } else {
-                Plugin.getLogger().info("Couldn't find player database '" + Config.getDB("historytable") + "', creating it...");
+                Plugin.getLogger().info("Couldn't find history table '" + Config.getDB("historytable") + "', creating it...");
                 query = "CREATE TABLE `" + Config.getDB("historytable") + "` (" +
-                        "`i` INT UNSIGNED NOT NULL AUTO_INCREMENT," +
-                        "`player1` TINYTEXT NULL DEFAULT '0'," +
-                        "`player2` TINYTEXT NULL DEFAULT '0'," +
-                        "`event` TINYTEXT NULL DEFAULT NULL," +
-                        "`json` TEXT NULL DEFAULT NULL," +
-                        "CONSTRAINT UNIQUE (i))";
+                        " `i` INT UNSIGNED NOT NULL AUTO_INCREMENT," +
+                        " `player1` TINYTEXT NULL DEFAULT '0'," +
+                        " `player2` TINYTEXT NULL DEFAULT '0'," +
+                        " `event` TINYTEXT NULL DEFAULT NULL," +
+                        " `json` TEXT NULL DEFAULT NULL," +
+                        " CONSTRAINT UNIQUE (i))";
                 stmnt = conn.prepareStatement(query);
                 stmnt.executeQuery();
             }
@@ -99,16 +99,16 @@ public class Database {
                     PreparedStatement stmnt;
                     //Check entry
                     query = "SELECT `name` " +
-                            "FROM `" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
-                            "WHERE `name` = ? LIMIT 1";
+                            " FROM `" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
+                            " WHERE `name` = ? LIMIT 1";
                     stmnt = conn.prepareStatement(query);
                     stmnt.setString(1, name);
                     ResultSet results = stmnt.executeQuery();
                     if (!results.next()) {
                         //Add entry
                         query = "INSERT " +
-                                "INTO `" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
-                                "(`name`) VALUES (?)";
+                                " INTO `" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
+                                " (`name`) VALUES (?)";
                         stmnt = conn.prepareStatement(query);
                         stmnt.setString(1, name);
                         stmnt.executeQuery();
