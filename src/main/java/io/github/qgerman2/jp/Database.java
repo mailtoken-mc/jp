@@ -19,11 +19,25 @@ public class Database {
             conn = DriverManager.getConnection("jdbc:mariadb://localhost:3306/" + Config.getDB("name"),
                     Config.getDB("user"), Config.getDB("pass"));
             Plugin.getLogger().info("Successfully connected to database server");
+            //Create advancement count function
+            query = "CREATE OR REPLACE FUNCTION advancementCount(player TINYTEXT) RETURNS INT " +
+                    "BEGIN " +
+                    " SET @s = 0;" +
+                    " FOR i IN 1..80 DO " +
+                    "  SELECT SUBSTRING(`advancements`, i, 1) " +
+                    "   FROM `" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
+                    "   WHERE `name` = player INTO @n;" +
+                    "  SET @s = @s + @n;" +
+                    " END FOR;" +
+                    "RETURN @s;" +
+                    "END";
+            stmnt = conn.prepareStatement(query);
+            stmnt.executeQuery();
             //Check for player table
             query = "SELECT `TABLE_NAME` " +
-                    "FROM `information_schema`.`TABLES` " +
-                    "WHERE `TABLE_SCHEMA` = ? " +
-                    "AND `TABLE_NAME` = ? ";
+                    " FROM `information_schema`.`TABLES` " +
+                    " WHERE `TABLE_SCHEMA` = ? " +
+                    " AND `TABLE_NAME` = ? ";
             stmnt = conn.prepareStatement(query);
             stmnt.setString(1, Config.getDB("name"));
             stmnt.setString(2, Config.getDB("playertable"));
@@ -43,6 +57,7 @@ public class Database {
                         "`experience` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
                         "`time` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
                         "`advancements` BINARY(80) NOT NULL DEFAULT repeat('0', 80)," +
+                        "`advancement_count` INT(10) UNSIGNED NOT NULL DEFAULT '0'," +
                         "CONSTRAINT UNIQUE (name))";
                 stmnt = conn.prepareStatement(query);
                 stmnt.executeQuery();
@@ -109,10 +124,11 @@ public class Database {
             @Override
             public void run() {
                 try {
-                    String query = "UPDATE " +
-                            "`" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
-                            "SET `time` = `time` + ? " +
-                            "WHERE `name` = ?";
+                    String query =
+                            "UPDATE " +
+                            " `" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
+                            " SET `time` = `time` + ? " +
+                            " WHERE `name` = ?";
                     PreparedStatement stmnt = conn.prepareStatement(query);
                     stmnt.setLong(1, time);
                     stmnt.setString(2, name);
@@ -128,10 +144,11 @@ public class Database {
             @Override
             public void run() {
                 try {
-                    String query = "UPDATE " +
-                            "`" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
-                            "SET `alive` = 0, `died` = current_timestamp(), `death_reason` = ?, `death_by` = ? " +
-                            "WHERE `name` = ?";
+                    String query =
+                            "UPDATE " +
+                            " `" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
+                            " SET `alive` = 0, `died` = current_timestamp(), `death_reason` = ?, `death_by` = ? " +
+                            " WHERE `name` = ?";
                     PreparedStatement stmnt = conn.prepareStatement(query);
                     stmnt.setString(1, reason);
                     stmnt.setString(2, by);
@@ -148,10 +165,11 @@ public class Database {
             @Override
             public void run() {
                 try {
-                    String query = "INSERT " +
-                            "INTO `" + Config.getDB("name") + "`.`" + Config.getDB("historytable") + "` " +
-                            "(`i`, `player1`, `player2`, `event`, `json`) " +
-                            "VALUES (NULL, ?, ?, ?, ?)";
+                    String query =
+                            "INSERT " +
+                            " INTO `" + Config.getDB("name") + "`.`" + Config.getDB("historytable") + "` " +
+                            " (`i`, `player1`, `player2`, `event`, `json`) " +
+                            " VALUES (NULL, ?, ?, ?, ?)";
                     PreparedStatement stmnt = conn.prepareStatement(query);
                     stmnt.setString(1, player1);
                     stmnt.setString(2, player2);
@@ -169,10 +187,11 @@ public class Database {
             @Override
             public void run() {
                 try {
-                    String query = "UPDATE " +
-                            "`" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
-                            "SET `kills` = `kills` + 1 " +
-                            "WHERE `name` = ?";
+                    String query =
+                            "UPDATE " +
+                            " `" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
+                            " SET `kills` = `kills` + 1 " +
+                            " WHERE `name` = ?";
                     PreparedStatement stmnt = conn.prepareStatement(query);
                     stmnt.setString(1, player);
                     stmnt.executeQuery();
@@ -187,13 +206,17 @@ public class Database {
             @Override
             public void run() {
                 try {
-                    String query = "UPDATE " +
-                            "`" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
-                            "SET `advancements` = INSERT(`advancements`, ?, 1, '1') " +
-                            "WHERE `name` = ?";
+                    String query =
+                            "UPDATE " +
+                            " `" + Config.getDB("name") + "`.`" + Config.getDB("playertable") + "` " +
+                            " SET " +
+                            "  `advancements` = INSERT(`advancements`, ?, 1, '1')," +
+                            "  `advancement_count` = advancementCount(?) + 1" +
+                            " WHERE `name` = ? ";
                     PreparedStatement stmnt = conn.prepareStatement(query);
                     stmnt.setInt(1, advancement);
                     stmnt.setString(2, player);
+                    stmnt.setString(3, player);
                     stmnt.executeQuery();
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
