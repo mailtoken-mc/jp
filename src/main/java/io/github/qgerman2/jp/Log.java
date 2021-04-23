@@ -63,7 +63,7 @@ public class Log {
             by = damager.getName();
             if (damager instanceof Player) {
                 perp = by;
-                by = "Player";
+                reason = "PLAYER_ATTACK";
             }
         }
         Database.updatePlayerDeath(event.getEntity().getName(), reason, by);
